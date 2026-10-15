@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fato ou Fake? - Quiz 3D Interativo</title>
 
-  <!-- Tailwind CSS CDN -->
+  
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Font Awesome Icons -->
+  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- Google Fonts: Inter & Outfit -->
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
@@ -131,11 +131,11 @@
 </head>
 <body class="text-slate-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
 
-  <!-- CABEÇALHO -->
+  
   <header class="sticky top-0 z-40 glass-panel border-b border-slate-800/80 px-4 py-3 sm:px-8">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
       
-      <!-- Logo e Título -->
+      
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-blue-500/20">
           <i class="fa-solid fa-brain text-xl text-white"></i>
@@ -148,7 +148,7 @@
         </div>
       </div>
 
-      <!-- Placar de Progresso -->
+      
       <div class="flex items-center gap-2 sm:gap-4 bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800">
         <div class="px-3 py-1 text-center">
           <span class="block text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Testados</span>
@@ -166,7 +166,7 @@
         </div>
       </div>
 
-      <!-- Controles Superiores (Som e Ajustes) -->
+      
       <div class="flex items-center gap-2">
         <button id="btn-sound" onclick="toggleSound()" class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors border border-slate-700/50" title="Ativar/Desativar Som">
           <i id="icon-sound" class="fa-solid fa-volume-high text-emerald-400"></i>
@@ -179,15 +179,15 @@
     </div>
   </header>
 
-  <!-- CONTEÚDO PRINCIPAL -->
+ 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
 
-    <!-- BARRA DE FERRAMENTAS: Busca, Filtros e Ações Globais -->
+    
     <section class="mb-8 space-y-4">
       
       <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
         
-        <!-- Campo de Busca -->
+        
         <div class="relative w-full lg:w-96">
           <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
           <input 
@@ -202,7 +202,7 @@
           </button>
         </div>
 
-        <!-- Botões de Ação Global -->
+        
         <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
           <button onclick="flipAllCards(true)" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-xs sm:text-sm font-medium border border-slate-700 text-slate-200 transition-all flex items-center justify-center gap-2">
             <i class="fa-solid fa-eye"></i> Revelar Todos
@@ -214,14 +214,14 @@
 
       </div>
 
-      <!-- Filtros por Categoria -->
+      
       <div class="flex items-center gap-2 overflow-x-auto pb-2 pt-1 no-scrollbar text-sm" id="category-filters">
-        <!-- Gerado via JS -->
+        
       </div>
 
     </section>
 
-    <!-- MENSAGEM DE NENHUM RESULTADO -->
+   
     <div id="no-results" class="hidden text-center py-16 glass-panel rounded-3xl border border-slate-800 my-8">
       <i class="fa-solid fa-ghost text-5xl text-slate-600 mb-4"></i>
       <h3 class="text-xl font-bold text-slate-300">Nenhum fato encontrado</h3>
@@ -231,18 +231,18 @@
       </button>
     </div>
 
-    <!-- GRID DE CARTÕES -->
+    
     <section id="cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 perspective-container">
-      <!-- Cartões injetados via JS -->
+      
     </section>
 
   </main>
 
-  <!-- RODAPÉ ELEGANTE COM CRÉDITOS -->
+  
   <footer class="glass-panel border-t border-slate-800/80 mt-12 py-8 px-4 text-slate-400">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
       
-      <!-- Marca & Assinatura -->
+      
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
           JV
@@ -257,7 +257,7 @@
         </div>
       </div>
 
-      <!-- Detalhes Tecnológicos e Dicas -->
+      
       <div class="flex flex-wrap items-center justify-center md:justify-end gap-6 text-xs text-slate-400">
         <span class="flex items-center gap-1.5">
           <i class="fa-solid fa-cube text-blue-400"></i> Interface 3D
@@ -273,9 +273,9 @@
     </div>
   </footer>
 
-  <!-- JAVASCRIPT DA APLICAÇÃO -->
+  
   <script>
-    // BASE DE DADOS DOS FATOS
+   
     const factsDatabase = [
       {
         id: 1,
@@ -292,7 +292,7 @@
         statement: "A Grande Muralha da China é claramente visível a olho nu a partir da órbita da Terra ou da Lua.",
         isTrue: false,
         category: "História",
-        image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80",
+        image: "https://lh3.googleusercontent.com/grass-cs/AABkmLf5-olSEB5Royw1udjm9oFW61P_uBOxzaKhycCyZg6lM4YZzpP8ZGo-4kBUEBHHqA_3lafbsNm8IpxydSwH0XijOA4A6TwawNL3ZaAPlxuuJUW1urdSpi0qFkDWCZtYC8b5S9Kh=w270-h312-n-k-no",
         explanation: "É um mito popular! A muralha é feita de materiais com cores semelhantes ao solo e possui apenas alguns metros de largura. Astronautas e a NASA confirmam que ela não é visível a olho nu."
       },
       {
@@ -301,7 +301,7 @@
         statement: "O mel natural de abelhas é um dos poucos alimentos que nunca estraga se conservado fechado.",
         isTrue: true,
         category: "Ciência",
-        image: "https://images.unsplash.com/photo-1587049352847-4a222e784d38?auto=format&fit=crop&w=600&q=80",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1z_D83o252H7Mw58syxh6Rd8iXuCLe6Olt-0yo-rhYBBSDbgEIMnEXcPU8Vz1rTcWFR7VDy5qajGbsLeqD_q_XjbwI-c0xBAEV4YTWNWqSw&s=10",
         explanation: "Verdade! Devido à baixíssima umidade e alta acidez, bactérias não conseguem se proliferar. Mel com mais de 3.000 anos foi encontrado em tumbas egípcias ainda comestível."
       },
       {
@@ -328,7 +328,7 @@
         statement: "Napoleão Bonaparte era extremamente baixo para sua época, medindo menos de 1,50m.",
         isTrue: false,
         category: "História",
-        image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=80",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSd4_aReCitAs9UhfH6HW3ticqrGDUMQDAZFeA83vkVRw&s=10",
         explanation: "Falso! Napoleão media cerca de 1,68m, altura média para um francês no século XIX. O mito surgiu devido a erros na conversão de polegadas francesas para britânicas e propaganda inimiga."
       },
       {
@@ -387,7 +387,7 @@
       }
     ];
 
-    // ESTADO DA APLICAÇÃO
+   
     let currentCategory = "Todas";
     let searchQuery = "";
     let soundEnabled = true;
@@ -396,7 +396,7 @@
       surprised: new Set()
     };
 
-    // WEBAUDIO SINTETIZADO (Sem arquivos externos)
+   
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playSound(type) {
@@ -422,16 +422,16 @@
           osc.stop(now + 0.08);
         } else if (type === 'knew') {
           osc.type = 'triangle';
-          osc.frequency.setValueAtTime(523.25, now); // C5
-          osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+          osc.frequency.setValueAtTime(523.25, now); 
+          osc.frequency.setValueAtTime(659.25, now + 0.1); 
           gain.gain.setValueAtTime(0.1, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
           osc.start(now);
           osc.stop(now + 0.25);
         } else if (type === 'surprised') {
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(440, now); // A4
-          osc.frequency.setValueAtTime(554.37, now + 0.1); // C#5
+          osc.frequency.setValueAtTime(440, now); 
+          osc.frequency.setValueAtTime(554.37, now + 0.1); 
           gain.gain.setValueAtTime(0.1, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
           osc.start(now);
@@ -455,14 +455,15 @@
       }
     }
 
-    // INICIALIZAÇÃO E RENDERS
+    
     window.addEventListener('DOMContentLoaded', () => {
       renderCategoryFilters();
       renderCards();
       updateStats();
     });
 
-    // RENDEREIZAÇÃO DOS FILTROS POR CATEGORIA
+    
+  
     function renderCategoryFilters() {
       const categories = ["Todas", ...new Set(factsDatabase.map(f => f.category))];
       const container = document.getElementById('category-filters');
@@ -502,7 +503,7 @@
       renderCards();
     }
 
-    // BUSCA E PESQUISA
+    
     function handleSearch() {
       const input = document.getElementById('search-input');
       const clearBtn = document.getElementById('clear-search');
@@ -529,7 +530,7 @@
       renderCategoryFilters();
     }
 
-    // MONTAGEM DOS CARTÕES EM GRID
+  
     function renderCards() {
       const grid = document.getElementById('cards-grid');
       const noResults = document.getElementById('no-results');
@@ -563,10 +564,10 @@
           <div class="group h-[400px] w-full cursor-pointer select-none" onclick="toggleCardFlip(this, ${fact.id})">
             <div id="card-inner-${fact.id}" class="card-3d relative w-full h-full rounded-2xl shadow-xl">
               
-              <!-- FRENTE DO CARTÃO -->
+              
               <div class="card-face glass-card-front flex flex-col justify-between border border-slate-800 hover:border-slate-700 transition-colors">
                 
-                <!-- Imagem do Fato -->
+                
                 <div class="relative h-44 w-full overflow-hidden rounded-t-2xl">
                   <img 
                     src="${fact.image}" 
@@ -580,7 +581,7 @@
                   </span>
                 </div>
 
-                <!-- Conteúdo Frontal -->
+                
                 <div class="p-5 flex-grow flex flex-col justify-between">
                   <div>
                     <h3 class="font-display text-base font-bold text-slate-100 mb-2 group-hover:text-brand-500 transition-colors">
@@ -599,11 +600,11 @@
 
               </div>
 
-              <!-- VERSO DO CARTÃO -->
+              
               <div class="card-face card-face-back glass-card-back p-6 flex flex-col justify-between border-2 ${isTrue ? 'border-emerald-500/40' : 'border-rose-500/40'}">
                 
                 <div>
-                  <!-- Badge do Resultado -->
+                  
                   <div class="flex items-center justify-between mb-4">
                     <span class="badge-anim inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black tracking-widest border ${badgeColor}">
                       <i class="fa-solid ${badgeIcon}"></i> ${badgeText}
@@ -611,13 +612,13 @@
                     <span class="text-[10px] text-slate-500 font-semibold uppercase">#${fact.id}</span>
                   </div>
 
-                  <!-- Explicação do Fato -->
+                  
                   <p class="text-xs sm:text-sm text-slate-200 leading-relaxed overflow-y-auto max-h-[200px] pr-1">
                     ${fact.explanation}
                   </p>
                 </div>
 
-                <!-- Botoes de Reacao/Pontuação -->
+                
                 <div class="pt-4 border-t border-slate-800/80 flex items-center gap-2" onclick="event.stopPropagation()">
                   <button 
                     onclick="recordStat(${fact.id}, 'knew')"
@@ -650,7 +651,7 @@
       }).join('');
     }
 
-    // AÇÕES DE INTERAÇÃO DOS CARTÕES
+    
     function toggleCardFlip(element, id) {
       const cardInner = document.getElementById(`card-inner-${id}`);
       if (cardInner) {
@@ -673,7 +674,7 @@
       playSound('flip');
     }
 
-    // SISTEMA DE ESTATÍSTICAS E PLACAR
+    
     function recordStat(id, type) {
       if (type === 'knew') {
         userStats.surprised.delete(id);
