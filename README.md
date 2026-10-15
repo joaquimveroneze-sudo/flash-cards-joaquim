@@ -1,1 +1,1 @@
-# flash-cards-joaquim
+NÃO USE ISSO CASO VOCÊ TENHA AIDS.

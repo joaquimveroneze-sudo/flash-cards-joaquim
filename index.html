@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fato ou Fake? - Quiz 3D Interativo</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f6ff',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              900: '#1e3a8a',
+            },
+            factTrue: '#10b981',
+            factFalse: '#ef4444',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Estilos customizados e Animações 3D */
+    body {
+      background-color: #0b0f19;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(239, 68, 68, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Glassmorphism */
+    .glass-panel {
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-card-front {
+      background: rgba(22, 30, 46, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-card-back {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+    }
+
+    /* Estrutura 3D do Cartão */
+    .perspective-container {
+      perspective: 1200px;
+    }
+
+    .card-3d {
+      transform-style: preserve-3d;
+      transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Giro ao passar o mouse ou ao ativar a classe */
+    .group:hover .card-3d,
+    .card-3d.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 1.25rem;
+      overflow: hidden;
+    }
+
+    .card-face-back {
+      transform: rotateY(180deg);
+    }
+
+    /* Animação do Badge de Resultado */
+    @keyframes badgePulse {
+      0% { transform: scale(0.8); opacity: 0; }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .is-flipped .badge-anim,
+    .group:hover .badge-anim {
+      animation: badgePulse 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s forwards;
+    }
+
+    /* Scrollbar personalizada */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0f19;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1f2937;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #374151;
+    }
+  </style>
+</head>
+<body class="text-slate-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+
+  <!-- CABEÇALHO -->
+  <header class="sticky top-0 z-40 glass-panel border-b border-slate-800/80 px-4 py-3 sm:px-8">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- Logo e Título -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-blue-500/20">
+          <i class="fa-solid fa-brain text-xl text-white"></i>
+        </div>
+        <div>
+          <h1 class="font-display font-extrabold text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">
+            Fato ou Fake?
+          </h1>
+          <p class="text-xs text-slate-400 font-medium">Explore mitos e verdades do universo</p>
+        </div>
+      </div>
+
+      <!-- Placar de Progresso -->
+      <div class="flex items-center gap-2 sm:gap-4 bg-slate-900/80 p-1.5 rounded-2xl border border-slate-800">
+        <div class="px-3 py-1 text-center">
+          <span class="block text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Testados</span>
+          <span id="stat-total" class="font-display text-lg font-bold text-white">0/0</span>
+        </div>
+        <div class="w-px h-8 bg-slate-800"></div>
+        <div class="px-3 py-1 text-center">
+          <span class="block text-[10px] uppercase tracking-wider text-emerald-400 font-semibold">Eu Sabia</span>
+          <span id="stat-knew" class="font-display text-lg font-bold text-emerald-400">0</span>
+        </div>
+        <div class="w-px h-8 bg-slate-800"></div>
+        <div class="px-3 py-1 text-center">
+          <span class="block text-[10px] uppercase tracking-wider text-amber-400 font-semibold">Aprendi</span>
+          <span id="stat-surprised" class="font-display text-lg font-bold text-amber-400">0</span>
+        </div>
+      </div>
+
+      <!-- Controles Superiores (Som e Ajustes) -->
+      <div class="flex items-center gap-2">
+        <button id="btn-sound" onclick="toggleSound()" class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors border border-slate-700/50" title="Ativar/Desativar Som">
+          <i id="icon-sound" class="fa-solid fa-volume-high text-emerald-400"></i>
+        </button>
+        <button onclick="resetStats()" class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors border border-slate-700/50" title="Reiniciar Placar">
+          <i class="fa-solid fa-rotate-left"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+    <!-- BARRA DE FERRAMENTAS: Busca, Filtros e Ações Globais -->
+    <section class="mb-8 space-y-4">
+      
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+        
+        <!-- Campo de Busca -->
+        <div class="relative w-full lg:w-96">
+          <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input 
+            type="text" 
+            id="search-input"
+            placeholder="Pesquisar por assunto ou palavra-chave..." 
+            class="w-full pl-11 pr-4 py-3 rounded-2xl glass-panel text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all border border-slate-800"
+            oninput="handleSearch()"
+          >
+          <button id="clear-search" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1">
+            <i class="fa-solid fa-circle-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Botões de Ação Global -->
+        <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
+          <button onclick="flipAllCards(true)" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-xs sm:text-sm font-medium border border-slate-700 text-slate-200 transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-eye"></i> Revelar Todos
+          </button>
+          <button onclick="flipAllCards(false)" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-xs sm:text-sm font-medium border border-slate-700 text-slate-200 transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-arrow-rotate-left"></i> Esconder Todos
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Filtros por Categoria -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 pt-1 no-scrollbar text-sm" id="category-filters">
+        <!-- Gerado via JS -->
+      </div>
+
+    </section>
+
+    <!-- MENSAGEM DE NENHUM RESULTADO -->
+    <div id="no-results" class="hidden text-center py-16 glass-panel rounded-3xl border border-slate-800 my-8">
+      <i class="fa-solid fa-ghost text-5xl text-slate-600 mb-4"></i>
+      <h3 class="text-xl font-bold text-slate-300">Nenhum fato encontrado</h3>
+      <p class="text-slate-500 text-sm mt-1">Tente pesquisar por outro termo ou selecione outra categoria.</p>
+      <button onclick="resetFilters()" class="mt-4 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium transition-colors">
+        Limpar Filtros
+      </button>
+    </div>
+
+    <!-- GRID DE CARTÕES -->
+    <section id="cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 perspective-container">
+      <!-- Cartões injetados via JS -->
+    </section>
+
+  </main>
+
+  <!-- RODAPÉ ELEGANTE COM CRÉDITOS -->
+  <footer class="glass-panel border-t border-slate-800/80 mt-12 py-8 px-4 text-slate-400">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      
+      <!-- Marca & Assinatura -->
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+          JV
+        </div>
+        <div>
+          <p class="text-sm font-medium text-slate-200">
+            Desenvolvido por <span class="font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-300 to-emerald-400">Joaquim Veroneze</span>
+          </p>
+          <p class="text-xs text-slate-500">
+            © 2026 Fato ou Fake Quiz • Todos os direitos reservados.
+          </p>
+        </div>
+      </div>
+
+      <!-- Detalhes Tecnológicos e Dicas -->
+      <div class="flex flex-wrap items-center justify-center md:justify-end gap-6 text-xs text-slate-400">
+        <span class="flex items-center gap-1.5">
+          <i class="fa-solid fa-cube text-blue-400"></i> Interface 3D
+        </span>
+        <span class="flex items-center gap-1.5">
+          <i class="fa-solid fa-bolt text-amber-400"></i> Tailwind & Web Audio
+        </span>
+        <span class="flex items-center gap-1.5 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-800 text-slate-300">
+          <i class="fa-solid fa-hand-pointer text-emerald-400"></i> Dica: Toque no cartão para girar
+        </span>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT DA APLICAÇÃO -->
+  <script>
+    // BASE DE DADOS DOS FATOS
+    const factsDatabase = [
+      {
+        id: 1,
+        title: "Leões em Sociedade",
+        statement: "Os leões são os únicos grandes felinos que vivem em grupos sociais organizados.",
+        isTrue: true,
+        category: "Natureza",
+        image: "https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=600&q=80",
+        explanation: "Enquanto tigres, leopardos e onças são animais solitários, os leões vivem em alcateias (prides) que podem ter até 30 indivíduos com cooperação para caça e proteção."
+      },
+      {
+        id: 2,
+        title: "Muralha da China do Espaço",
+        statement: "A Grande Muralha da China é claramente visível a olho nu a partir da órbita da Terra ou da Lua.",
+        isTrue: false,
+        category: "História",
+        image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80",
+        explanation: "É um mito popular! A muralha é feita de materiais com cores semelhantes ao solo e possui apenas alguns metros de largura. Astronautas e a NASA confirmam que ela não é visível a olho nu."
+      },
+      {
+        id: 3,
+        title: "Mel Imortal",
+        statement: "O mel natural de abelhas é um dos poucos alimentos que nunca estraga se conservado fechado.",
+        isTrue: true,
+        category: "Ciência",
+        image: "https://images.unsplash.com/photo-1587049352847-4a222e784d38?auto=format&fit=crop&w=600&q=80",
+        explanation: "Verdade! Devido à baixíssima umidade e alta acidez, bactérias não conseguem se proliferar. Mel com mais de 3.000 anos foi encontrado em tumbas egípcias ainda comestível."
+      },
+      {
+        id: 4,
+        title: "Nuvem de Água Espacial",
+        statement: "Existe uma nuvem gigante de água no espaço com 140 trilhões de vezes a água dos oceanos terrestres.",
+        isTrue: true,
+        category: "Espaço",
+        image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80",
+        explanation: "Astrônomos descobriram um quasar a 12 bilhões de anos-luz cercado por um reservatório colossal de vapor de água. É o maior corpo de água já achado no Universo."
+      },
+      {
+        id: 5,
+        title: "Cérebro Elétrico",
+        statement: "O cérebro humano gera energia elétrica suficiente para acender uma pequena lâmpada LED.",
+        isTrue: true,
+        category: "Corpo Humano",
+        image: "https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=600&q=80",
+        explanation: "Acordado, o cérebro humano produz cerca de 10 a 23 watts de potência elétrica através dos impulsos neurais — suficiente para acender uma LED fraca."
+      },
+      {
+        id: 6,
+        title: "Altura de Napoleão",
+        statement: "Napoleão Bonaparte era extremamente baixo para sua época, medindo menos de 1,50m.",
+        isTrue: false,
+        category: "História",
+        image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=80",
+        explanation: "Falso! Napoleão media cerca de 1,68m, altura média para um francês no século XIX. O mito surgiu devido a erros na conversão de polegadas francesas para britânicas e propaganda inimiga."
+      },
+      {
+        id: 7,
+        title: "Tubarões e Câncer",
+        statement: "Os tubarões são imunes e jamais desenvolvem qualquer tipo de câncer ou tumor.",
+        isTrue: false,
+        category: "Natureza",
+        image: "https://images.unsplash.com/photo-1560275619-4660e43a9306?auto=format&fit=crop&w=600&q=80",
+        explanation: "Mito! Cientistas e biólogos marinhos já documentaram diversos tumores e casos de câncer em mais de 20 espécies de tubarões."
+      },
+      {
+        id: 8,
+        title: "Wi-Fi e Micro-ondas",
+        statement: "O sinal de Wi-Fi opera na mesma frequência de rádio de 2,4 GHz da maioria dos fornos micro-ondas.",
+        isTrue: true,
+        category: "Tecnologia",
+        image: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=600&q=80",
+        explanation: "Exato! Ambos utilizam a faixa de 2.4 GHz. É por isso que micro-ondas antigos ou sem isolamento perfeito podem causar oscilações no sinal de internet da sua casa."
+      },
+      {
+        id: 9,
+        title: "Efeito Pipoca",
+        statement: "O milho vira pipoca por conta da expansão de uma gotícula de água em seu interior.",
+        isTrue: true,
+        category: "Ciência",
+        image: "https://images.unsplash.com/photo-1578849278619-e73505e9610f?auto=format&fit=crop&w=600&q=80",
+        explanation: "Correto! Ao esquentar, a água dentro do grão transforma-se em vapor e pressuriza a casca até ela estourar, transformando o amido aquecido numa espuma macia."
+      },
+      {
+        id: 10,
+        title: "Cor do Sol",
+        statement: "Visto diretamente do espaço sideral, a cor real da luz do Sol é amarelo vibrante.",
+        isTrue: false,
+        category: "Espaço",
+        image: "https://images.unsplash.com/photo-1532693322450-2cb5c511067d?auto=format&fit=crop&w=600&q=80",
+        explanation: "Do espaço, o Sol é puramente BRANCO! Ele nos parece amarelado aqui na Terra porque nossa atmosfera dispersa a luz azul com mais eficácia."
+      },
+      {
+        id: 11,
+        title: "Primeiro Bug do Mundo",
+        statement: "O termo 'bug' na informática surgiu de uma mariposa real presa no relé de um computador em 1947.",
+        isTrue: true,
+        category: "Tecnologia",
+        image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80",
+        explanation: "A pioneira Grace Hopper registrou em seu diário de bordo uma mariposa de verdade retirada do computador Harvard Mark II com a nota: 'Primeiro caso real de bug encontrado'."
+      },
+      {
+        id: 12,
+        title: "Vitamina C e Resfriados",
+        statement: "Tomar doses elevadas de Vitamina C previne totalmente contra o contágio do resfriado comum.",
+        isTrue: false,
+        category: "Corpo Humano",
+        image: "https://images.unsplash.com/photo-1616671285428-98f988229b0a?auto=format&fit=crop&w=600&q=80",
+        explanation: "Diversos estudos mostram que a Vitamina C não impede o contágio do resfriado na população geral, embora possa diminuir levemente a duração dos sintomas."
+      }
+    ];
+
+    // ESTADO DA APLICAÇÃO
+    let currentCategory = "Todas";
+    let searchQuery = "";
+    let soundEnabled = true;
+    let userStats = {
+      knew: new Set(),
+      surprised: new Set()
+    };
+
+    // WEBAUDIO SINTETIZADO (Sem arquivos externos)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      try {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'flip') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(300, now);
+          osc.frequency.exponentialRampToValueAtTime(600, now + 0.08);
+          gain.gain.setValueAtTime(0.05, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'knew') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } else if (type === 'surprised') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, now); // A4
+          osc.frequency.setValueAtTime(554.37, now + 0.1); // C#5
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        }
+      } catch (e) {
+        console.log("Audio de áudio desativado pelo navegador.");
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const icon = document.getElementById('icon-sound');
+      const btn = document.getElementById('btn-sound');
+      if (soundEnabled) {
+        icon.className = 'fa-solid fa-volume-high text-emerald-400';
+        btn.classList.remove('opacity-50');
+      } else {
+        icon.className = 'fa-solid fa-volume-xmark text-slate-500';
+        btn.classList.add('opacity-50');
+      }
+    }
+
+    // INICIALIZAÇÃO E RENDERS
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCategoryFilters();
+      renderCards();
+      updateStats();
+    });
+
+    // RENDEREIZAÇÃO DOS FILTROS POR CATEGORIA
+    function renderCategoryFilters() {
+      const categories = ["Todas", ...new Set(factsDatabase.map(f => f.category))];
+      const container = document.getElementById('category-filters');
+      
+      container.innerHTML = categories.map(cat => {
+        const isActive = cat === currentCategory;
+        return `
+          <button 
+            onclick="setCategory('${cat}')"
+            class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-2 border ${
+              isActive 
+                ? 'bg-brand-600 border-brand-500 text-white shadow-lg shadow-brand-500/25' 
+                : 'glass-panel border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+            }"
+          >
+            ${getCategoryIcon(cat)} ${cat}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function getCategoryIcon(cat) {
+      switch(cat) {
+        case 'Natureza': return '<i class="fa-solid fa-leaf text-emerald-400"></i>';
+        case 'História': return '<i class="fa-solid fa-landmark text-amber-400"></i>';
+        case 'Ciência': return '<i class="fa-solid fa-flask text-purple-400"></i>';
+        case 'Espaço': return '<i class="fa-solid fa-meteor text-blue-400"></i>';
+        case 'Corpo Humano': return '<i class="fa-solid fa-heart-pulse text-rose-400"></i>';
+        case 'Tecnologia': return '<i class="fa-solid fa-microchip text-cyan-400"></i>';
+        default: return '<i class="fa-solid fa-shapes text-slate-400"></i>';
+      }
+    }
+
+    function setCategory(cat) {
+      currentCategory = cat;
+      renderCategoryFilters();
+      renderCards();
+    }
+
+    // BUSCA E PESQUISA
+    function handleSearch() {
+      const input = document.getElementById('search-input');
+      const clearBtn = document.getElementById('clear-search');
+      searchQuery = input.value.toLowerCase().trim();
+      
+      if (searchQuery.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+      renderCards();
+    }
+
+    function clearSearch() {
+      document.getElementById('search-input').value = '';
+      searchQuery = '';
+      document.getElementById('clear-search').classList.add('hidden');
+      renderCards();
+    }
+
+    function resetFilters() {
+      currentCategory = 'Todas';
+      clearSearch();
+      renderCategoryFilters();
+    }
+
+    // MONTAGEM DOS CARTÕES EM GRID
+    function renderCards() {
+      const grid = document.getElementById('cards-grid');
+      const noResults = document.getElementById('no-results');
+
+      const filtered = factsDatabase.filter(fact => {
+        const matchesCategory = currentCategory === 'Todas' || fact.category === currentCategory;
+        const matchesSearch = fact.title.toLowerCase().includes(searchQuery) || 
+                              fact.statement.toLowerCase().includes(searchQuery) ||
+                              fact.explanation.toLowerCase().includes(searchQuery);
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        noResults.classList.remove('hidden');
+        return;
+      }
+
+      noResults.classList.add('hidden');
+
+      grid.innerHTML = filtered.map(fact => {
+        const isTrue = fact.isTrue;
+        const badgeColor = isTrue ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border-rose-500/30';
+        const badgeText = isTrue ? 'VERDADEIRO' : 'FALSO';
+        const badgeIcon = isTrue ? 'fa-check-circle' : 'fa-times-circle';
+
+        const isKnew = userStats.knew.has(fact.id);
+        const isSurprised = userStats.surprised.has(fact.id);
+
+        return `
+          <div class="group h-[400px] w-full cursor-pointer select-none" onclick="toggleCardFlip(this, ${fact.id})">
+            <div id="card-inner-${fact.id}" class="card-3d relative w-full h-full rounded-2xl shadow-xl">
+              
+              <!-- FRENTE DO CARTÃO -->
+              <div class="card-face glass-card-front flex flex-col justify-between border border-slate-800 hover:border-slate-700 transition-colors">
+                
+                <!-- Imagem do Fato -->
+                <div class="relative h-44 w-full overflow-hidden rounded-t-2xl">
+                  <img 
+                    src="${fact.image}" 
+                    alt="${fact.title}"
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    loading="lazy"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80"></div>
+                  <span class="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-slate-950/80 backdrop-blur-md text-slate-300 border border-slate-700/50">
+                    ${fact.category}
+                  </span>
+                </div>
+
+                <!-- Conteúdo Frontal -->
+                <div class="p-5 flex-grow flex flex-col justify-between">
+                  <div>
+                    <h3 class="font-display text-base font-bold text-slate-100 mb-2 group-hover:text-brand-500 transition-colors">
+                      ${fact.title}
+                    </h3>
+                    <p class="text-xs sm:text-sm text-slate-300 line-clamp-3 leading-relaxed">
+                      "${fact.statement}"
+                    </p>
+                  </div>
+
+                  <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-brand-500 font-semibold">
+                    <span>Girar e revelar</span>
+                    <i class="fa-solid fa-arrow-rotate-right group-hover:rotate-180 transition-transform duration-500"></i>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- VERSO DO CARTÃO -->
+              <div class="card-face card-face-back glass-card-back p-6 flex flex-col justify-between border-2 ${isTrue ? 'border-emerald-500/40' : 'border-rose-500/40'}">
+                
+                <div>
+                  <!-- Badge do Resultado -->
+                  <div class="flex items-center justify-between mb-4">
+                    <span class="badge-anim inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-black tracking-widest border ${badgeColor}">
+                      <i class="fa-solid ${badgeIcon}"></i> ${badgeText}
+                    </span>
+                    <span class="text-[10px] text-slate-500 font-semibold uppercase">#${fact.id}</span>
+                  </div>
+
+                  <!-- Explicação do Fato -->
+                  <p class="text-xs sm:text-sm text-slate-200 leading-relaxed overflow-y-auto max-h-[200px] pr-1">
+                    ${fact.explanation}
+                  </p>
+                </div>
+
+                <!-- Botoes de Reacao/Pontuação -->
+                <div class="pt-4 border-t border-slate-800/80 flex items-center gap-2" onclick="event.stopPropagation()">
+                  <button 
+                    onclick="recordStat(${fact.id}, 'knew')"
+                    class="flex-1 py-2 px-3 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
+                      isKnew 
+                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30' 
+                        : 'bg-slate-800/80 text-slate-400 hover:text-emerald-400 hover:bg-slate-700'
+                    }"
+                  >
+                    <i class="fa-solid fa-thumbs-up"></i> Já Sabia
+                  </button>
+
+                  <button 
+                    onclick="recordStat(${fact.id}, 'surprised')"
+                    class="flex-1 py-2 px-3 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
+                      isSurprised 
+                        ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30' 
+                        : 'bg-slate-800/80 text-slate-400 hover:text-amber-400 hover:bg-slate-700'
+                    }"
+                  >
+                    <i class="fa-solid fa-lightbulb"></i> Aprendi!
+                  </button>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // AÇÕES DE INTERAÇÃO DOS CARTÕES
+    function toggleCardFlip(element, id) {
+      const cardInner = document.getElementById(`card-inner-${id}`);
+      if (cardInner) {
+        cardInner.classList.toggle('is-flipped');
+        playSound('flip');
+      }
+    }
+
+    function flipAllCards(showBack) {
+      factsDatabase.forEach(fact => {
+        const cardInner = document.getElementById(`card-inner-${fact.id}`);
+        if (cardInner) {
+          if (showBack) {
+            cardInner.classList.add('is-flipped');
+          } else {
+            cardInner.classList.remove('is-flipped');
+          }
+        }
+      });
+      playSound('flip');
+    }
+
+    // SISTEMA DE ESTATÍSTICAS E PLACAR
+    function recordStat(id, type) {
+      if (type === 'knew') {
+        userStats.surprised.delete(id);
+        if (userStats.knew.has(id)) {
+          userStats.knew.delete(id);
+        } else {
+          userStats.knew.add(id);
+          playSound('knew');
+        }
+      } else if (type === 'surprised') {
+        userStats.knew.delete(id);
+        if (userStats.surprised.has(id)) {
+          userStats.surprised.delete(id);
+        } else {
+          userStats.surprised.add(id);
+          playSound('surprised');
+        }
+      }
+      updateStats();
+      renderCards();
+    }
+
+    function updateStats() {
+      const knewCount = userStats.knew.size;
+      const surprisedCount = userStats.surprised.size;
+      const totalTested = knewCount + surprisedCount;
+
+      document.getElementById('stat-total').innerText = `${totalTested}/${factsDatabase.length}`;
+      document.getElementById('stat-knew').innerText = knewCount;
+      document.getElementById('stat-surprised').innerText = surprisedCount;
+    }
+
+    function resetStats() {
+      userStats.knew.clear();
+      userStats.surprised.clear();
+      updateStats();
+      renderCards();
+      playSound('flip');
+    }
+  </script>
+</body>
+</html>
